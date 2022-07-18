@@ -1,6 +1,5 @@
 :root{
     --width-content: 94vw;
-    --width-season-tag: 10vw;
 }
 article.content-container{
     display: flex;
@@ -28,7 +27,6 @@ nav.season-navigation{
     gap: 4vw;
 }
 nav.season-navigation h2{
-    /* width: var(--width-season-tag); */
     color: white;
 }
 nav.season-navigation ul{
@@ -44,5 +42,30 @@ nav.season-navigation li button{
     width: 16vw;
     height: 5vh;
     background-color: green;
+    color: white;
+}
+
+section.episode-list{
+    width: var(--width-content);
+    display: flex;
+}
+
+section.episode-list ul{
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    width: var(--width-content);
+    gap: 4vh;
+}
+
+section.episode-list li{
+    display: flex;
+    flex-direction: column;
+}
+
+section.episode-list ul li img{
+    width: 100%;
+}
+section.episode-list ul li h3{
     color: white;
 }

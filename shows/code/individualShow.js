@@ -5,30 +5,46 @@ class ElementNames{
     static seasonName = "season-nametag";
     static imageSection = "image-section";
     static imagePhotoId = "image-photo";
+    static episodeList = "episode-list";
 }
 
 class IndividualShow {
     #mainContainer;
     #contentContainer;
     #imageUrlPath;;
-    #deviceType;
     #showData = {};
     #currentSeason = 2;
     #currentSeasonData = {};
+    #startUrl = "http://api.themoviedb.org/3/tv/";
+    #seriesId = 1996;
+    #urlMiddle = "/season/";
+    #urlEnd = "?api_key=";
+    #apiKey = "64f44f1d52f9493b67df43ad61941d4b";
+    #imageStartPath = "https://image.tmdb.org/t/p/w300";
+    #content = {};
+    
     constructor() {
         // Change this to use session storage retrieved from clicking a specific
         // show.
         loadTemplate();
-        this.#currentSeasonData = JSON.parse(localStorage.getItem("seasonData"));
         this.#showData = JSON.parse(localStorage.getItem("showData"));
         this.#imageUrlPath = localStorage.getItem("imageUrlPath");
         this.#mainContainer = document.querySelector("main");
     }
-    run = () => {
+    run = async() => {
+        this.#currentSeasonData = await this.#getSeasonData();
         this.#loadSeasonInformation();
         this.#loadSeasonNavigation();
+        this.#loadEpisodeList();
     }
-
+    
+    #getSeasonData = () => {
+        const data = fetch(this.#getEntireUrl())
+            .then(response => response.json());
+        return data;
+    }
+    #getEntireUrl = () => this.#startUrl + this.#seriesId + this.#urlMiddle + this.season + this.#urlEnd + this.#apiKey;
+    
     #loadSeasonInformation = () => {
         this.#contentContainer = document.createElement("article");
         this.#contentContainer.className = "content-container";
@@ -41,9 +57,10 @@ class IndividualShow {
         imageSection.className = ElementNames.imageSection;
         this.#contentContainer.appendChild(imageSection);
         const image = document.createElement("img");
-        const seasonImage = this.#showData.seasons[this.season].poster_path;
+        const path = this.#showData.seasons[this.season].poster_path;
         image.id = ElementNames.imagePhotoId;
-        image.src = this.#imageUrlPath + seasonImage;
+        image.alt = `Season ${this.season} image`;
+        image.src = this.#getImagePath(path);
         imageSection.appendChild(image);
     }
     ///////////////
@@ -63,6 +80,7 @@ class IndividualShow {
         list.className = ElementNames.seasonNavigation;
         list.addEventListener("click", event => {
             this.season = Number(event.target.textContent);
+
         });
         const seasonLength = this.#showData.seasons.length;
         for(let i=0; i<seasonLength; i++){
@@ -74,17 +92,49 @@ class IndividualShow {
         }
         return list;
     }
+    #getImagePath = (path) => this.#imageUrlPath + path;
     // This is ran when changing seasons.
-    #updateSeasonContent(){
+    #updateSeasonContent = async() =>{
         const imagePhoto = document.getElementById(ElementNames.imagePhotoId);
         const path = this.#showData.seasons[this.season].poster_path;
-        const imagePath = this.#imageUrlPath + path;
-        imagePhoto.src = imagePath;
+        imagePhoto.src = this.#getImagePath(path);
+        this.#currentSeasonData = await this.#getSeasonData();
+        this.#loadEpisodeList();
+
     }
     ////////////////////////// 
+
+    #loadEpisodeList = () => {
+        console.log("season:", this.season);
+        const episodeContainer = document.createElement("section");
+        episodeContainer.id = ElementNames.episodeList;
+        this.#contentContainer.appendChild(episodeContainer);
+        episodeContainer.className = ElementNames.episodeList;
+        const episodeList = document.createElement("ul");
+        episodeContainer.append(episodeList);
+        const seasonEpisodes = this.#currentSeasonData.episodes;
+
+        for(const episode in seasonEpisodes){
+            const episodeElement = document.createElement("li");
+            episodeList.appendChild(episodeElement);
+            const episodeImage = document.createElement("img");
+            episodeElement.appendChild(episodeImage);
+            episodeImage.src = this.#getImagePath(seasonEpisodes[episode].still_path);
+            episodeImage.loading = "lazy";
+            const episodeTitleElement = document.createElement("h3");
+            episodeElement.appendChild(episodeTitleElement);
+            const episodeTitle = seasonEpisodes[episode].name;
+            const episodeNumber = seasonEpisodes[episode].episode_number;
+            episodeTitleElement.innerText = `${episodeNumber}. ${episodeTitle}`;
+            episodeImage.alt = `${episodeNumber}. ${episodeTitle}`;
+        }
+        console.log("finished loading everything.");
+    }
     set season(value){
         if(this.#currentSeason === value) return;
         this.#currentSeason = value;
+        const episodeList = document.getElementById(ElementNames.episodeList);
+        episodeList.remove();
         this.#updateSeasonContent();
     }
     get season(){
@@ -96,27 +146,4 @@ const individualShow = new IndividualShow();
 individualShow.run();
 
 
-// class ApiData {
-//     #startUrl = "http://api.themoviedb.org/3/tv/";
-//     #seriesId = 1996;
-//     #urlEnd = "?api_key=";
-//     #apiKey = "64f44f1d52f9493b67df43ad61941d4b";
-//     #imageStartPath = "https://image.tmdb.org/t/p/original";
-//     #content = {};
 
-//     #getEntireUrl = () => this.#startUrl + this.#seriesId + this.#urlEnd + this.#apiKey;
-//     get = () => {
-//         const data = fetch(this.#getEntireUrl())
-//             .then(response => response.json());
-//         return data;
-//     }
-// }
-
-// const getData = async() => {
-//     const api = new ApiData();
-//     const data = await api.get();
-//     console.log(data);
-//     localStorage.setItem("show-data", JSON.stringify(data));
-// }
-
-// getData();
