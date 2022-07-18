@@ -13,11 +13,11 @@ article.content-container{
 }
 
 section.image-section{
-    width: var(--width-content);
+    width: 100vw;
 }
 
 section.image-section img{
-    width: var(--width-content);
+    width: 100vw;
     height: auto;
 }
 

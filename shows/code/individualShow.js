@@ -1,17 +1,15 @@
 import { loadTemplate } from '../template.js';
-
 class ElementNames {
+    static contentContainer = "content-container";
     static seasonNavigation = "season-navigation";
     static seasonName = "season-nametag";
     static imageSection = "image-section";
     static imagePhotoId = "image-photo";
+    static episodeContainerId = "all-episodes";
     static episodeList = "episode-list";
 }
-
 class IndividualShow {
-    #mainContainer;
-    #contentContainer;
-    #showData = {}; 
+    #showData = {};
     #currentSeason = 1;
     #currentSeasonData = {};
     #startUrl = "https://api.themoviedb.org/3/tv/";
@@ -20,22 +18,31 @@ class IndividualShow {
     #urlEnd = "?api_key=";
     #apiKey = "64f44f1d52f9493b67df43ad61941d4b";
     #imageUrlPath = "https://image.tmdb.org/t/p/original/";
-    // #episodeWidth = 500;
     #content = {};
 
     constructor() {
-        // Change this to use session storage retrieved from clicking a specific
-        // show.
         loadTemplate();
-        // this.#showData = JSON.parse(localStorage.getItem("showData"));
-        this.#mainContainer = document.querySelector("main");
+        this.#init();
     }
     run = async () => {
         this.#showData = await this.#getShowData();
         this.#currentSeasonData = await this.#getSeasonData();
         this.#loadSeasonInformation();
         this.#loadSeasonNavigation();
-        this.#loadEpisodeList();
+    }
+    #init = () => {
+        const siteTemplate = `
+        <article class="${ElementNames.contentContainer}">
+            <section class="${ElementNames.imageSection}" id="${ElementNames.imageSection}"></section>
+            <nav class="${ElementNames.seasonNavigation}" id="${ElementNames.seasonNavigation}">
+                <h2>Season</h2>
+            </nav>
+            <section class="${ElementNames.episodeList}" id="${ElementNames.episodeList}">
+                <ul id="${ElementNames.episodeContainerId}"></ul>
+            </section>
+        </article>   
+        `;
+        document.querySelector("main").innerHTML += siteTemplate;
     }
     #getShowData = () => {
         const showData = fetch(this.showUrl)
@@ -53,107 +60,53 @@ class IndividualShow {
     #getEntireUrl = () => this.#startUrl + this.#seriesId + this.#urlMiddle + this.season + this.#urlEnd + this.#apiKey;
 
     #loadSeasonInformation = () => {
-        this.#contentContainer = document.createElement("article");
-        this.#contentContainer.className = "content-container";
-        this.#mainContainer.appendChild(this.#contentContainer);
-        this.#loadSeasonImage();
-    }
-
-    #loadSeasonImage = () => {
-        const imageSection = document.createElement("section");
-        imageSection.className = ElementNames.imageSection;
-        this.#contentContainer.appendChild(imageSection);
-        const image = document.createElement("img");
-        const path = this.#showData.seasons[this.season].poster_path;
-        image.id = ElementNames.imagePhotoId;
-        image.alt = `Season ${this.season} image`;
-        image.src = this.#imageUrlPath + path;
-        console.log(this.#imageUrlPath + path);
-        imageSection.appendChild(image);
-    }
-    ///////////////
-    #loadSeasonNavigation = () => {
-        const navigation = document.createElement("nav");
-        this.#contentContainer.appendChild(navigation);
-        navigation.className = ElementNames.seasonNavigation;
-        const nametag = document.createElement("h2");
-        nametag.innerText = "Season";
-        navigation.appendChild(nametag);
-        const navigationList = this.#createSeasonNavigationList();
-        navigation.appendChild(navigationList);
-    }
-
-    #createSeasonNavigationList = () => {
-        const list = document.createElement("ul");
-        list.className = ElementNames.seasonNavigation;
-        list.addEventListener("click", event => {
-            this.season = Number(event.target.textContent);
-
-        });
-        const seasonLength = this.#showData.seasons.length;
-        for (let i = 0; i < seasonLength; i++) {
-            const itemElement = document.createElement("li");
-            const seasonNumber = document.createElement("button");
-            seasonNumber.textContent = i;
-            seasonNumber.id = "season-" + String(i);
-            itemElement.appendChild(seasonNumber);
-            list.appendChild(itemElement);
-        }
-        return list;
-    }
-    // This is ran when changing seasons.
-    #updateSeasonContent = async () => {
-        const imagePhoto = document.getElementById(ElementNames.imagePhotoId);
-        const path = this.#showData.seasons[this.season].poster_path;
-        imagePhoto.src = this.#imageUrlPath + path;
-        this.#currentSeasonData = await this.#getSeasonData();
+        const imageElement = document.getElementById(ElementNames.imageSection);
+        const posterPath = this.#showData.seasons[this.season].poster_path;
+        const seasonImage = `
+            <img id="${ElementNames.imagePhotoId}" alt="Season ${this.season} image" src="${this.#imageUrlPath + posterPath}">
+        `;
+        imageElement.innerHTML = seasonImage;
         this.#loadEpisodeList();
 
     }
-    ////////////////////////// 
 
+    #loadSeasonNavigation = () => {
+        const navigationList = document.createElement("ul");
+        navigationList.addEventListener("click", event => {
+                this.season = Number(event.target.textContent);
+            });
+        const seasonLength = this.#showData.seasons.length;
+        for (let i = 0; i < seasonLength; i++) {
+            const list = `<li> <button id="season-${i}">${i}</button> </li>`;
+            navigationList.innerHTML += list;
+        }
+        const seasonNavigationBar = document.getElementById(ElementNames.seasonNavigation);
+        seasonNavigationBar.append(navigationList);
+    }
     #loadEpisodeList = () => {
-
-        const activeButton = document.getElementById("season-" + String(this.#currentSeason));
-        activeButton.click();
-        activeButton.focus();
-
-        const episodeContainer = document.createElement("section");
-        episodeContainer.id = ElementNames.episodeList;
-        this.#contentContainer.appendChild(episodeContainer);
-        episodeContainer.className = ElementNames.episodeList;
-        const episodeList = document.createElement("ul");
-        episodeList.id = "all-episodes";
-        episodeContainer.append(episodeList);
+        let episodeList = document.getElementById(ElementNames.episodeContainerId);
+        episodeList.innerHTML = "";
         const seasonEpisodes = this.#currentSeasonData.episodes;
         for (const episode in seasonEpisodes) {
-            this.#loadEpisode(seasonEpisodes[episode]);
+            this.#loadEpisode(seasonEpisodes[episode], episodeList);
         }
     }
-    #loadEpisode = (episode) => {
-        const episodeList = document.getElementById("all-episodes");
-        const episodeElement = document.createElement("li");
-        const episodeImage = document.createElement("img");
-        episodeElement.appendChild(episodeImage);
-        // episodeImage.src = this.#imageUrlPath + "w" + this.#episodeWidth + episode.still_path;
-        episodeImage.src = this.#imageUrlPath + episode.still_path;
-        episodeImage.width = 1920;
-        episodeImage.height = 1080;
-        episodeImage.loading = "lazy";
-        const episodeTitleElement = document.createElement("h3");
-        episodeElement.appendChild(episodeTitleElement);
-        const episodeTitle = episode.name;
-        const episodeNumber = episode.episode_number;
-        episodeTitleElement.innerText = `${episodeNumber}. ${episodeTitle}`;
-        episodeImage.alt = `${episodeNumber}. ${episodeTitle}`;
-        episodeList.appendChild(episodeElement);
+    #loadEpisode = (episode, episodeList) => {
+        const episodeTitle = `${episode.episode_number}. ${episode.name}`;
+        const episodeData = `
+        <li>
+            <img width="1920" height="1080" loading="lazy" alt="${episodeTitle}" src="${this.#imageUrlPath + episode.still_path}">
+            <h3>${episodeTitle}</h3>
+        </li>
+        `;
+        episodeList.innerHTML += episodeData;
     }
     set season(value) {
         if (this.#currentSeason === value) return;
         this.#currentSeason = value;
         const episodeList = document.getElementById(ElementNames.episodeList);
         episodeList.remove();
-        this.#updateSeasonContent();
+        this.#loadSeasonInformation();
     }
     get season() {
         return this.#currentSeason;
