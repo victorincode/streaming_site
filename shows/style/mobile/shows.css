@@ -1,46 +1,50 @@
-:root{
+:root {
     --width-content: 94vw;
 }
-article.content-container{
+
+article.content-container {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100vw;
     height: 100vh;
     margin-top: 5vh;
-    gap: 4vh;
+    gap: 2vh;
     background-color: black;
 }
 
-section.image-section{
+section.image-section {
     width: 100vw;
 }
 
-section.image-section img{
+section.image-section img {
     width: 100vw;
     height: auto;
 }
 
-nav.season-navigation{
+nav.season-navigation {
     display: flex;
     align-items: center;
     width: var(--width-content);
     height: 5vh;
     gap: 4vw;
 }
-nav.season-navigation h2{
+
+nav.season-navigation h2 {
     color: white;
 }
-nav.season-navigation ul{
+
+nav.season-navigation ul {
     display: flex;
     list-style: none;
     overflow: auto;
 }
 
-nav.season-navigation li{
+nav.season-navigation li {
     color: white;
 }
-nav.season-navigation li button{
+
+nav.season-navigation li button {
     width: 16vw;
     height: 5vh;
     font-size: 1.25rem;
@@ -48,31 +52,27 @@ nav.season-navigation li button{
     border: none;
     color: white;
 }
-nav.season-navigation li button:focus{
+
+nav.season-navigation li button:focus {
     background-color: red;
 }
-section.episode-list{
+
+section.episode-container{
     width: var(--width-content);
     display: flex;
+    flex-direction: column; 
 }
 
-section.episode-list ul{
+ul.episode-list {
     display: flex;
     flex-direction: column;
-    list-style: none;
-    width: var(--width-content);
-    gap: 4vh;
+    gap: 6vh;
 }
-
-section.episode-list li{
-    display: flex;
-    flex-direction: column;
-}
-
-section.episode-list ul li img{
+ul.episode-list img{
     width: 100%;
     height: auto;
-} 
-section.episode-list ul li h3{
+}
+
+ul.episode-list h3{
     color: white;
 }

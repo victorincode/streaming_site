@@ -5,12 +5,13 @@ class ElementNames {
     static seasonName = "season-nametag";
     static imageSection = "image-section";
     static imagePhotoId = "image-photo";
-    static episodeContainerId = "all-episodes";
+    static episodeContainerId = "episode-container";
     static episodeList = "episode-list";
+    static individualEpisode = "individual-episode";
 }
 class IndividualShow {
     #showData = {};
-    #currentSeason = 1;
+    #currentSeason = 0;
     #currentSeasonData = {};
     #startUrl = "https://api.themoviedb.org/3/tv/";
     #seriesId = 95479;
@@ -26,7 +27,6 @@ class IndividualShow {
     }
     run = async () => {
         this.#showData = await this.#getShowData();
-        this.#currentSeasonData = await this.#getSeasonData();
         this.#loadSeasonInformation();
         this.#loadSeasonNavigation();
     }
@@ -37,8 +37,8 @@ class IndividualShow {
             <nav class="${ElementNames.seasonNavigation}" id="${ElementNames.seasonNavigation}">
                 <h2>Season</h2>
             </nav>
-            <section class="${ElementNames.episodeList}" id="${ElementNames.episodeList}">
-                <ul id="${ElementNames.episodeContainerId}"></ul>
+            <section class="${ElementNames.episodeContainerId}">
+                <ul class="${ElementNames.episodeList}" id="${ElementNames.episodeList}"></ul>
             </section>
         </article>   
         `;
@@ -63,7 +63,7 @@ class IndividualShow {
         const imageElement = document.getElementById(ElementNames.imageSection);
         const posterPath = this.#showData.seasons[this.season].poster_path;
         const seasonImage = `
-            <img id="${ElementNames.imagePhotoId}" alt="Season ${this.season} image" src="${this.#imageUrlPath + posterPath}">
+        <img id="${ElementNames.imagePhotoId}" alt="Season ${this.season} image" src="${this.#imageUrlPath + posterPath}">
         `;
         imageElement.innerHTML = seasonImage;
         this.#loadEpisodeList();
@@ -83,10 +83,18 @@ class IndividualShow {
         const seasonNavigationBar = document.getElementById(ElementNames.seasonNavigation);
         seasonNavigationBar.append(navigationList);
     }
-    #loadEpisodeList = () => {
-        let episodeList = document.getElementById(ElementNames.episodeContainerId);
+    #loadEpisodeList = async() => {
+        let episodeList = document.getElementById(ElementNames.episodeList);
         episodeList.innerHTML = "";
+        episodeList.addEventListener("click", event => {
+            console.log(event.target);
+            // if(event.target.className !== ElementNames.individualEpisode) return;
+            // console.log("hey");
+            // console.log(episodeList.dataset.episode);
+        });
+        this.#currentSeasonData = await this.#getSeasonData();
         const seasonEpisodes = this.#currentSeasonData.episodes;
+        console.log(seasonEpisodes);
         for (const episode in seasonEpisodes) {
             this.#loadEpisode(seasonEpisodes[episode], episodeList);
         }
@@ -94,7 +102,7 @@ class IndividualShow {
     #loadEpisode = (episode, episodeList) => {
         const episodeTitle = `${episode.episode_number}. ${episode.name}`;
         const episodeData = `
-        <li>
+        <li id="${ElementNames.individualEpisode}" data-episode="${episode.episode_number}">
             <img width="1920" height="1080" loading="lazy" alt="${episodeTitle}" src="${this.#imageUrlPath + episode.still_path}">
             <h3>${episodeTitle}</h3>
         </li>
@@ -104,8 +112,6 @@ class IndividualShow {
     set season(value) {
         if (this.#currentSeason === value) return;
         this.#currentSeason = value;
-        const episodeList = document.getElementById(ElementNames.episodeList);
-        episodeList.remove();
         this.#loadSeasonInformation();
     }
     get season() {
