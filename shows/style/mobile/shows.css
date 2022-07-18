@@ -13,11 +13,12 @@ article.content-container{
 }
 
 section.image-section{
-    width: 100vw;
+    width: var(--width-content);
 }
 
 section.image-section img{
-    width: 500px;
+    width: var(--width-content);
+    height: auto;
 }
 
 nav.season-navigation{
@@ -68,9 +69,10 @@ section.episode-list li{
     flex-direction: column;
 }
 
-/* section.episode-list ul li img{
+section.episode-list ul li img{
     width: 100%;
-} */
+    height: auto;
+} 
 section.episode-list ul li h3{
     color: white;
 }

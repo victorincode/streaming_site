@@ -19,8 +19,8 @@ class IndividualShow {
     #urlMiddle = "/season/";
     #urlEnd = "?api_key=";
     #apiKey = "64f44f1d52f9493b67df43ad61941d4b";
-    #imageUrlPath = "https://image.tmdb.org/t/p/";
-    #episodeWidth = 500;
+    #imageUrlPath = "https://image.tmdb.org/t/p/original/";
+    // #episodeWidth = 500;
     #content = {};
 
     constructor() {
@@ -67,7 +67,7 @@ class IndividualShow {
         const path = this.#showData.seasons[this.season].poster_path;
         image.id = ElementNames.imagePhotoId;
         image.alt = `Season ${this.season} image`;
-        image.src = this.#imageUrlPath + "original/" + path;
+        image.src = this.#imageUrlPath + path;
         console.log(this.#imageUrlPath + path);
         imageSection.appendChild(image);
     }
@@ -105,7 +105,7 @@ class IndividualShow {
     #updateSeasonContent = async () => {
         const imagePhoto = document.getElementById(ElementNames.imagePhotoId);
         const path = this.#showData.seasons[this.season].poster_path;
-        imagePhoto.src = this.#imageUrlPath + "original/" + path;
+        imagePhoto.src = this.#imageUrlPath + path;
         this.#currentSeasonData = await this.#getSeasonData();
         this.#loadEpisodeList();
 
@@ -135,8 +135,10 @@ class IndividualShow {
         const episodeElement = document.createElement("li");
         const episodeImage = document.createElement("img");
         episodeElement.appendChild(episodeImage);
-        episodeImage.src = this.#imageUrlPath + "w" + this.#episodeWidth + episode.still_path;
-        episodeImage.width = this.#episodeWidth;
+        // episodeImage.src = this.#imageUrlPath + "w" + this.#episodeWidth + episode.still_path;
+        episodeImage.src = this.#imageUrlPath + episode.still_path;
+        episodeImage.width = 1920;
+        episodeImage.height = 1080;
         episodeImage.loading = "lazy";
         const episodeTitleElement = document.createElement("h3");
         episodeElement.appendChild(episodeTitleElement);
