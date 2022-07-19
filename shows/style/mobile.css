@@ -1,0 +1,126 @@
+:root {
+    --width-content: 94vw;
+}
+
+@font-face {
+    font-family: 'Rajdhani';
+    src: url(../fonts/Rajdhani-Medium.ttf);
+}
+@font-face {
+    font-family: 'Rajdhani-Bold';
+    src: url(../fonts/Rajdhani-Bold.ttf);
+}
+
+*{
+    margin: 0;
+    padding: 0;
+    font-family: 'Rajdhani';
+    scroll-behavior: smooth;
+}
+body{
+    background-color: black;
+}
+p{
+    font-size: 1.1rem;
+}
+
+main.main-container{
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2vh;
+}
+
+section.image-section {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1vh;
+}
+
+section.image-section img {
+    width: 100vw;
+    height: auto;
+}
+
+.show-information{
+    position: relative;
+    width: var(--width-content);
+    color: white;
+}
+h1{
+    font-size: 2rem;
+}
+h1,h2,h3{
+    font-family: 'Rajdhani-Bold';
+}
+
+article.content-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background-color: black;
+}
+
+
+nav.season-navigation {
+    display: flex;
+    align-items: center;
+    width: var(--width-content);
+    height: 5vh;
+    gap: 4vw;
+    border-bottom: 2px solid rgb(22, 36, 94);
+    margin-bottom: 2vh;
+}
+
+nav.season-navigation h2 {
+    color: white;
+}
+
+nav.season-navigation ul {
+    display: flex;
+    list-style: none;
+    overflow: auto;
+}
+
+nav.season-navigation li {
+    color: white;
+}
+
+nav.season-navigation li button {
+    width: 16vw;
+    height: 5vh;
+    font-size: 1.25rem;
+    background-color: black;
+    border: none;
+    color: white;
+}
+
+nav.season-navigation li button:active {
+    background-color: red;
+}
+
+ul.episode-list {
+    width: var(--width-content);
+    display: flex;
+    flex-direction: column;
+    gap: 6vh;
+    padding-bottom: 4vh;
+}
+ul.episode-list li{
+    width: var(--width-content);
+}
+ul.episode-list img{
+    pointer-events: none;
+    width: 100%;
+    height: auto;
+}
+
+ul.episode-list h3{
+    color: white;
+}
